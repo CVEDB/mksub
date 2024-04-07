@@ -1,15 +1,21 @@
-FROM --platform=linux/amd64 golang:1.17.1-alpine as build
+FROM golang:1.17.2-alpine AS build-env
 
-RUN apk update
+RUN apk add git
+ADD . /go/src/mksub
+WORKDIR /go/src/mksub
+RUN go build -o mksub
 
-COPY . /app
+FROM alpine:3.14
+LABEL licenses.mksub.name="MIT" \
+      licenses.mksub.url="https://github.com/cvedb/mksub/blob/main/LICENSE" \
+      licenses.golang.name="bsd-3-clause" \
+      licenses.golang.url="https://go.dev/LICENSE?m=text"
+
+COPY --from=build-env /go/src/mksub/mksub /bin/mksub
+
+RUN mkdir -p /hive/in /hive/out
 
 WORKDIR /app
+RUN apk add bash
 
-RUN env GOOS=linux GOARCH=amd64 go build .
-
-FROM --platform=linux/amd64 alpine:3.16.0
-
-COPY --from=build  /app/mksub /usr/bin/mksub
-
-ENTRYPOINT ["mksub"]
+ENTRYPOINT [ "mksub" ]
