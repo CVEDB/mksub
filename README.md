@@ -16,7 +16,7 @@ Binaries are available in the [latest release](https://github.com/cvedb/mksub/re
 
 ## Docker
 ```
-docker run quay.io/cvedb/mksub
+docker run ghcr.io/cvedb/mksub
 ```
 
 ## From source
